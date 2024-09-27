@@ -42,12 +42,18 @@
             "href": ""
         }
     ],
-    "activationEvents": [],
+    "activationEvents": [
+        "onStartupFinished"
+    ],
     "contributes": {
         "commands": [
             {
                 "command": "gitodo-test.helloWorld",
                 "title": "Test Gitodo Plugin"
+            },
+            {
+                "command": "gitodo-test.todoCheck",
+                "title": "Checking for TODO under cursor"
             }
         ]
     },
