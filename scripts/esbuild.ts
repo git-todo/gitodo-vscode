@@ -70,11 +70,16 @@ const reactOptions: BuildOptions = {
 };
 
 async function main() {
-    let ctx: BuildContext | undefined;
+    let extctx: BuildContext | undefined;
+    let reactctx: BuildContext | undefined;
     try {
         if (isWatchMode) {
-            ctx = await esbuild.context(options);
-            await ctx.watch();
+            extctx = await esbuild.context(options);
+            await extctx.watch();
+
+            // build the React app
+            reactctx = await esbuild.context(reactOptions);
+            await reactctx.watch();
         } else {
             const result = await esbuild.build(options);
             if (process.argv.includes('--analyze')) {
@@ -82,12 +87,10 @@ async function main() {
                 console.log(chunksTree);
             }
         }
-
-        // build the React app
-        await esbuild.build(reactOptions);
     } catch (error) {
         console.error(error);
-        ctx?.dispose();
+        extctx?.dispose();
+        reactctx?.dispose();
         process.exit(1);
     }
 }

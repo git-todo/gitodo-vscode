@@ -32,11 +32,23 @@ export function activate(context: vscode.ExtensionContext) {
 
         if (!jsScriptPath) {
             vscode.window.showErrorMessage('No Js File Found');
-        } else {
-            vscode.window.showInformationMessage('Opening Gitodo View');
         }
+
+        const cssStylePath = panel.webview.asWebviewUri(
+            vscode.Uri.joinPath(context.extensionUri, 'out', 'react', 'output.css'),
+        );
+
+        if (!cssStylePath) {
+            vscode.window.showErrorMessage('No CSS File Found');
+        }
+
+        if (jsScriptPath && cssStylePath) {
+            vscode.window.showInformationMessage('Startin Webview');
+        }
+
         panel.webview.html = getWebviewContent({
             scriptJs: jsScriptPath,
+            styleCss: cssStylePath,
         });
 
         panel.webview.onDidReceiveMessage(async (msg: any) => {
@@ -71,7 +83,13 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(disposable, openWebviewCommand);
 }
 
-function getWebviewContent({ scriptJs }: { scriptJs: vscode.Uri }): string {
+function getWebviewContent({
+    scriptJs,
+    styleCss,
+}: {
+    scriptJs: vscode.Uri;
+    styleCss: vscode.Uri;
+}): string {
     const nonce = createNonce();
     return `
         <!DOCTYPE html>
@@ -80,6 +98,7 @@ function getWebviewContent({ scriptJs }: { scriptJs: vscode.Uri }): string {
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Gitodo Extension</title>
+            <link rel="stylesheet" href="${styleCss}">
         </head>
         <body>
             <div id="root"></div>
