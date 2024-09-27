@@ -3,5 +3,5 @@
     "compilerOptions": {
         "outDir": "../out/react"
     },
-    "include": ["**/*.ts", "**/*.tsx"]
+    "include": ["**/*.ts", "**/*.tsx", "tailwind.config.js"]
 }

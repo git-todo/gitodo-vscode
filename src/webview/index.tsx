@@ -1,9 +1,6 @@
-import type { ReactElement } from "react"
 import { createRoot } from 'react-dom/client';
 
-const App = (): ReactElement => {
-    return <div>Hello World</div>
-}
+import App from './App';
 
 const container = document.querySelector('#root');
 if (!container) {
