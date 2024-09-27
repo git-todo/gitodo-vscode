@@ -1,29 +1,30 @@
 {
-    "name": "awesome-vscode-extension-boilerplate",
-    "displayName": "Awesome VSCode Extension Boilerplate",
-    "version": "0.0.29",
-    "description": "An awesome vscode extension boilerplate",
-    "publisher": "YuTengjing",
+    "name": "gitodo-vscode-plugin",
+    "displayName": "Official VSCode Plugin for Gitodo",
+    "version": "0.0.1",
+    "description": "Enchance your Gitodo experience with this official VSCode plugin",
+    "publisher": "gidodo",
     "private": true,
     "preview": true,
     "author": {
-        "name": "YuTengjing",
-        "email": "ytj2713151713@gmail.com",
-        "url": "https://github.com/tjx666"
+        "name": "gidodo",
+        "email": "hello@gitodo.io",
+        "url": "https://gitodo.io"
     },
     "license": "SEE LICENSE IN LICENSE",
-    "homepage": "https://github.com/tjx666/awesome-vscode-extension-boilerplate/blob/master/README.md",
+    "homepage": "",
     "repository": {
         "type": "git",
-        "url": "https://github.com/tjx666/awesome-vscode-extension-boilerplate"
+        "url": ""
     },
     "bugs": {
-        "url": "https://github.com/tjx666/awesome-vscode-extension-boilerplate/issues",
-        "email": "ytj2713151713@gmail.com"
+        "url": "",
+        "email": "hello@gitodo.io"
     },
     "keywords": [
-        "boilerplate",
-        "template"
+        "vscode",
+        "gitodo",
+    "plugin"
     ],
     "categories": [
         "Other"
@@ -36,17 +37,17 @@
     },
     "badges": [
         {
-            "url": "https://img.shields.io/badge/PRs-welcome-brightgreen.svg",
-            "description": "PRs Welcome",
-            "href": "https://github.com/tjx666/awesome-vscode-extension-boilerplate/fork"
+            "url": "",
+            "description": "",
+            "href": ""
         }
     ],
     "activationEvents": [],
     "contributes": {
         "commands": [
             {
-                "command": "awesome-vscode-extension-boilerplate.helloWorld",
-                "title": "Hello World"
+                "command": "",
+                "title": ""
             }
         ]
     },
