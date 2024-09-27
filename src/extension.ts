@@ -16,10 +16,13 @@ export function activate(context: vscode.ExtensionContext) {
 
     const openWebviewCommand = vscode.commands.registerCommand('gitodo-test.openWebview', () => {
         const panel = vscode.window.createWebviewPanel(
-            'gitodoWebview', // Internal ID for the webview
-            'Gitodo', // Title of the webview panel
-            vscode.ViewColumn.One, // Show in the first editor tab
-            {}, // Webview options
+            'gitodoWebview',
+            'Gitodo',
+            vscode.ViewColumn.One,
+            {
+                enableScripts: true,
+                retainContextWhenHidden: true,
+            },
         );
 
         // Set the HTML content of the webview
@@ -80,16 +83,13 @@ function getWebviewContent({ scriptJs }: { scriptJs: vscode.Uri }): string {
         </head>
         <body>
             <div id="root"></div>
-            <div>
-                <h1>not react</h1>
-            </div>
             <script>
                 const vscode = acquireVsCodeApi();
                 window.onload = function() {
                     vscode.postMessage({ command: 'startup' });
                 };
             </script>
-            <script type="text/javascript nonce="${nonce}" src="${scriptJs}"></script>
+            <script nonce="${nonce}" src="${scriptJs}"></script>
         </body>
         </html>
     `;
