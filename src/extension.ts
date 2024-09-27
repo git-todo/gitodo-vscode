@@ -1,5 +1,7 @@
 import * as vscode from 'vscode';
 
+import { createNonce } from './createNonce';
+
 export function activate(context: vscode.ExtensionContext) {
     // Use the console to output diagnostic information (console.log) and errors (console.error)
     // This line of code will only be executed once when your extension is activated
@@ -21,7 +23,22 @@ export function activate(context: vscode.ExtensionContext) {
         );
 
         // Set the HTML content of the webview
-        panel.webview.html = getWebviewContent();
+        const jsScriptPath = panel.webview.asWebviewUri(
+            vscode.Uri.joinPath(context.extensionUri, 'out', 'react', 'index.js'),
+        );
+
+        if (!jsScriptPath) {
+            vscode.window.showErrorMessage('No Js File Found');
+        } else {
+            vscode.window.showInformationMessage('Opening Gitodo View');
+        }
+        panel.webview.html = getWebviewContent({
+            scriptJs: jsScriptPath,
+        });
+
+        panel.webview.onDidReceiveMessage(async (msg: any) => {
+            console.log('message received', msg);
+        });
     });
 
     const todoCheck = () => {
@@ -39,7 +56,7 @@ export function activate(context: vscode.ExtensionContext) {
 
         // chec if this line contains a todo
         if (thisLineText.includes('TODO') || thisLineText.includes('todo')) {
-            const logMessage = `Line ${thisLineNumber + 1} contains a TODO`;
+            const logMessage = `Line ${thisLineNumber + 1} contains a TODO ${new Date().toLocaleTimeString()}`;
             vscode.window.showInformationMessage(logMessage);
         }
     };
@@ -51,7 +68,8 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(disposable, openWebviewCommand);
 }
 
-function getWebviewContent(): string {
+function getWebviewContent({ scriptJs }: { scriptJs: vscode.Uri }): string {
+    const nonce = createNonce();
     return `
         <!DOCTYPE html>
         <html lang="en">
@@ -61,8 +79,17 @@ function getWebviewContent(): string {
             <title>Gitodo Extension</title>
         </head>
         <body>
-            <h1>Welcome to Gitodo</h1>
-            
+            <div id="root"></div>
+            <div>
+                <h1>not react</h1>
+            </div>
+            <script>
+                const vscode = acquireVsCodeApi();
+                window.onload = function() {
+                    vscode.postMessage({ command: 'startup' });
+                };
+            </script>
+            <script type="text/javascript nonce="${nonce}" src="${scriptJs}"></script>
         </body>
         </html>
     `;

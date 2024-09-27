@@ -2,6 +2,7 @@
 
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import process from 'node:process';
 
 import type { BuildContext, BuildOptions } from 'esbuild';
 import esbuild from 'esbuild';
@@ -14,10 +15,7 @@ const options: BuildOptions = {
     bundle: true,
     metafile: process.argv.includes('--metafile'),
     outdir: './out/src',
-    external: [
-        'vscode',
-        'typescript', // vue-component-meta
-    ],
+    external: ['vscode', 'typescript'],
     format: 'cjs',
     platform: 'node',
     target: 'ESNext',
@@ -56,6 +54,21 @@ const options: BuildOptions = {
     ],
 };
 
+const reactOptions: BuildOptions = {
+    color: true,
+    logLevel: 'info',
+    sourcemap: process.argv.includes('--sourcemap'),
+    entryPoints: ['src/webview/index.tsx'],
+    outdir: './out/react',
+    bundle: true,
+    format: 'cjs',
+    external: [],
+    platform: 'browser',
+    target: 'es2020',
+    loader: { '.tsx': 'tsx', '.ts': 'ts' },
+    tsconfig: './src/webview/tsconfig.json',
+};
+
 async function main() {
     let ctx: BuildContext | undefined;
     try {
@@ -69,6 +82,9 @@ async function main() {
                 console.log(chunksTree);
             }
         }
+
+        // build the React app
+        await esbuild.build(reactOptions);
     } catch (error) {
         console.error(error);
         ctx?.dispose();
