@@ -12,6 +12,18 @@ export function activate(context: vscode.ExtensionContext) {
         );
     });
 
+    const openWebviewCommand = vscode.commands.registerCommand('gitodo-test.openWebview', () => {
+        const panel = vscode.window.createWebviewPanel(
+            'gitodoWebview', // Internal ID for the webview
+            'Gitodo', // Title of the webview panel
+            vscode.ViewColumn.One, // Show in the first editor tab
+            {}, // Webview options
+        );
+
+        // Set the HTML content of the webview
+        panel.webview.html = getWebviewContent();
+    });
+
     const todoCheck = () => {
         const editor = vscode.window.activeTextEditor;
 
@@ -36,7 +48,24 @@ export function activate(context: vscode.ExtensionContext) {
         todoCheck();
     });
 
-    context.subscriptions.push(disposable);
+    context.subscriptions.push(disposable, openWebviewCommand);
+}
+
+function getWebviewContent(): string {
+    return `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Gitodo Extension</title>
+        </head>
+        <body>
+            <h1>Welcome to Gitodo</h1>
+            
+        </body>
+        </html>
+    `;
 }
 
 export function deactivate() {}

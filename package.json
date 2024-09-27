@@ -54,6 +54,17 @@
             {
                 "command": "gitodo-test.todoCheck",
                 "title": "Checking for TODO under cursor"
+            },
+            {
+                "command": "gitodo-test.openWebview",
+                "title": "Open Gitodo Webview"
+            }
+        ],
+        "keybindings": [
+            {
+                "command": "gitodo-test.openWebview",
+                "key": "ctrl+shift+t",
+                "when": "editorTextFocus"
             }
         ]
     },
