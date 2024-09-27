@@ -24,7 +24,7 @@
     "keywords": [
         "vscode",
         "gitodo",
-    "plugin"
+        "plugin"
     ],
     "categories": [
         "Other"
@@ -46,8 +46,8 @@
     "contributes": {
         "commands": [
             {
-                "command": "",
-                "title": ""
+                "command": "gitodo-test.helloWorld",
+                "title": "Test Gitodo Plugin"
             }
         ]
     },
