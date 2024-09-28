@@ -1,6 +1,15 @@
 import * as vscode from 'vscode';
 
 import { createNonce } from './createNonce';
+import type { Todo } from './utils/markdown';
+import { createMarkDown } from './utils/markdown';
+
+const DEMO_TODO: Todo = {
+    id: '1',
+    commitHash: '273963e738871b927d5b8274c3b3119722356bfe',
+    createdAt: new Date(),
+    todo: `store results in Redux`,
+};
 
 export function activate(context: vscode.ExtensionContext) {
     const disposable = vscode.commands.registerCommand('gitodo-test.helloWorld', () => {
@@ -114,11 +123,11 @@ export function activate(context: vscode.ExtensionContext) {
 
             if (lineText.includes('TODO') || lineText.includes('todo')) {
                 // Return a hover message
-                return new vscode.Hover(
-                    new vscode.MarkdownString(
-                        `This line contains a TODO ${new Date().toLocaleTimeString()}`,
-                    ),
-                );
+                const markDown = new vscode.MarkdownString(createMarkDown(DEMO_TODO));
+                markDown.supportHtml = true;
+                markDown.isTrusted = true;
+                markDown.supportThemeIcons = true;
+                return new vscode.Hover(markDown);
             }
 
             return null;
