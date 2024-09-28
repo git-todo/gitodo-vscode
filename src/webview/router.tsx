@@ -1,6 +1,7 @@
 import { createHashRouter } from 'react-router-dom';
 
 import RootLayout from './layouts/RootLayout';
+import HomePage from './pages/Home';
 import SettingsPage from './pages/Settings';
 
 const router = createHashRouter([
@@ -9,7 +10,7 @@ const router = createHashRouter([
         children: [
             {
                 path: '/',
-                element: <h1>Home</h1>,
+                element: <HomePage />,
             },
             {
                 path: '/settings',

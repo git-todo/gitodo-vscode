@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 
 import { createNonce } from './createNonce';
+import type { GitExtensionAPI } from './types/git';
 import type { Todo } from './utils/markdown';
 import { createMarkDown } from './utils/markdown';
 
@@ -36,7 +37,28 @@ export function activate(context: vscode.ExtensionContext) {
         gitodoStatusbarItem.show();
     };
 
+    const handleGitRepository = () => {
+        const gitExtension: vscode.Extension<GitExtensionAPI> =
+            vscode.extensions.getExtension('vscode.git')!;
+        if (!gitExtension) {
+            vscode.window.showErrorMessage('Git extension not found!');
+            return;
+        }
+
+        const gitAPI = gitExtension.exports.getAPI(1);
+
+        const repositories = gitAPI.repositories;
+        if (repositories.length === 0) {
+            vscode.window.showInformationMessage('No Git repository found in the workspace.');
+            return;
+        }
+
+        const repo = repositories[0];
+        vscode.window.showInformationMessage(`Git repository found: ${repo.state.HEAD?.name}`);
+    };
+
     updateStatusBar();
+    handleGitRepository();
 
     const disposable = vscode.commands.registerCommand('gitodo-test.helloWorld', () => {
         vscode.window.showInformationMessage(
@@ -72,7 +94,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
 
         if (jsScriptPath && cssStylePath) {
-            vscode.window.showInformationMessage('Startin Webview');
+            vscode.window.showInformationMessage('Starting Webview');
         }
 
         panel.webview.html = getWebviewContent({
@@ -181,7 +203,7 @@ function getWebviewContent({
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Gitodo Extension</title>
-            <link rel="stylesheet" href="${styleCss}">
+            <link nonce="${nonce}" rel="stylesheet" href="${styleCss}">
         </head>
         <body>
             <div id="root"></div>
