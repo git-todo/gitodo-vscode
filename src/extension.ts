@@ -45,20 +45,23 @@ export function activate(context: vscode.ExtensionContext) {
             return;
         }
 
-        const gitAPI = gitExtension.exports.getAPI(1);
+        gitExtension.activate().then(() => {
+            const gitAPI = gitExtension.exports.getAPI(1);
+            const repositories = gitAPI.repositories;
+            if (repositories.length === 0) {
+                vscode.window.showInformationMessage('No Git repository found in the workspace.');
+                return;
+            }
 
-        const repositories = gitAPI.repositories;
-        if (repositories.length === 0) {
-            vscode.window.showInformationMessage('No Git repository found in the workspace.');
-            return;
-        }
-
-        const repo = repositories[0];
-        vscode.window.showInformationMessage(`Git repository found: ${repo.state.HEAD?.name}`);
+            const repo = repositories[0];
+            vscode.window.showInformationMessage(`Git repository found: ${repo.state.HEAD?.name}`);
+        });
     };
 
     updateStatusBar();
-    handleGitRepository();
+    setTimeout(() => {
+        handleGitRepository(); // need to wait a bit, otherwise it did not work
+    }, 1000);
 
     const disposable = vscode.commands.registerCommand('gitodo-test.helloWorld', () => {
         vscode.window.showInformationMessage(
@@ -183,6 +186,7 @@ export function activate(context: vscode.ExtensionContext) {
         todoCheck();
         showGitodoDecoration();
         updateStatusBar();
+        handleGitRepository();
     });
 
     context.subscriptions.push(disposable, openWebviewCommand, todoHoverProvider);

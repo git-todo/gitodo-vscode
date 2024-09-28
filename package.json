@@ -29,6 +29,9 @@
     "categories": [
         "Other"
     ],
+    "extensionDependencies": [
+        "vscode.git"
+    ],
     "main": "./out/src/extension.js",
     "icon": "assets/logo.png",
     "packageManager": "pnpm@9.9.0",
