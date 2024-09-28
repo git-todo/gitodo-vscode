@@ -3,12 +3,7 @@ import * as vscode from 'vscode';
 import { createNonce } from './createNonce';
 
 export function activate(context: vscode.ExtensionContext) {
-    // Use the console to output diagnostic information (console.log) and errors (console.error)
-    // This line of code will only be executed once when your extension is activated
-    console.log('Gitodo Plugin activated');
-
     const disposable = vscode.commands.registerCommand('gitodo-test.helloWorld', () => {
-        // The code you place here will be executed every time your command is executed
         vscode.window.showInformationMessage(
             `${new Date().toLocaleTimeString()} Hello World from Gitodo!`,
         );
@@ -25,7 +20,6 @@ export function activate(context: vscode.ExtensionContext) {
             },
         );
 
-        // Set the HTML content of the webview
         const jsScriptPath = panel.webview.asWebviewUri(
             vscode.Uri.joinPath(context.extensionUri, 'out', 'react', 'index.js'),
         );
@@ -76,11 +70,67 @@ export function activate(context: vscode.ExtensionContext) {
         }
     };
 
-    vscode.window.onDidChangeTextEditorSelection(() => {
-        todoCheck();
+    let decorationType: vscode.TextEditorDecorationType | undefined;
+
+    const showGitodoDecoration = () => {
+        const editor = vscode.window.activeTextEditor;
+        const document = editor?.document;
+        if (!editor || !document) {
+            return;
+        }
+
+        // Clear any previous decorations
+        if (decorationType) {
+            editor.setDecorations(decorationType, []);
+        }
+
+        decorationType = vscode.window.createTextEditorDecorationType({
+            after: {
+                contentText: `TODO ${new Date().toLocaleTimeString()}`,
+                color: 'gray',
+                fontStyle: 'italic',
+                margin: '0 0 0 1em',
+            },
+        });
+
+        const selection = editor.selection;
+        const thisLineText = document.lineAt(selection.active.line).text;
+        if (thisLineText.includes('TODO') || thisLineText.includes('todo')) {
+            const currentLine = editor.selection.active.line;
+            const range = new vscode.Range(
+                document.lineAt(currentLine).range.end,
+                document.lineAt(currentLine).range.end,
+            );
+            editor.setDecorations(decorationType, [range]);
+        } else {
+            editor.setDecorations(decorationType, []);
+        }
+    };
+
+    // Register the hover provider
+    const todoHoverProvider = vscode.languages.registerHoverProvider('*', {
+        provideHover(document, position) {
+            const lineText = document.lineAt(position).text;
+
+            if (lineText.includes('TODO') || lineText.includes('todo')) {
+                // Return a hover message
+                return new vscode.Hover(
+                    new vscode.MarkdownString(
+                        `This line contains a TODO ${new Date().toLocaleTimeString()}`,
+                    ),
+                );
+            }
+
+            return null;
+        },
     });
 
-    context.subscriptions.push(disposable, openWebviewCommand);
+    vscode.window.onDidChangeTextEditorSelection(() => {
+        todoCheck();
+        showGitodoDecoration();
+    });
+
+    context.subscriptions.push(disposable, openWebviewCommand, todoHoverProvider);
 }
 
 function getWebviewContent({

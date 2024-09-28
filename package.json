@@ -58,11 +58,20 @@
             {
                 "command": "gitodo-test.openWebview",
                 "title": "Open Gitodo Webview"
+            },
+            {
+                "command": "gitodo-test.showTodoHover",
+                "title": "Show TODO Hover"
             }
         ],
         "keybindings": [
             {
                 "command": "gitodo-test.openWebview",
+                "key": "ctrl+shift+t",
+                "when": "editorTextFocus"
+            },
+            {
+                "command": "gitodo-test.showTodoHover",
                 "key": "ctrl+shift+t",
                 "when": "editorTextFocus"
             }
