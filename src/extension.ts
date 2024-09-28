@@ -12,6 +12,29 @@ const DEMO_TODO: Todo = {
 };
 
 export function activate(context: vscode.ExtensionContext) {
+    // set up statusbar item
+    const gitodoStatusbarItem = vscode.window.createStatusBarItem(
+        vscode.StatusBarAlignment.Right,
+        100,
+    );
+
+    gitodoStatusbarItem.text = `$(zap) Gitodo Active`;
+
+    // gitodoStatusbarItem.show();
+
+    const updateStatusBar = () => {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) {
+            return;
+        } else {
+            const fileName = editor.document.fileName.split('/').pop();
+            gitodoStatusbarItem.text = `$(file-code) Gitodo: ${fileName}`;
+        }
+        gitodoStatusbarItem.show();
+    };
+
+    updateStatusBar();
+
     const disposable = vscode.commands.registerCommand('gitodo-test.helloWorld', () => {
         vscode.window.showInformationMessage(
             `${new Date().toLocaleTimeString()} Hello World from Gitodo!`,
@@ -137,6 +160,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.window.onDidChangeTextEditorSelection(() => {
         todoCheck();
         showGitodoDecoration();
+        updateStatusBar();
     });
 
     context.subscriptions.push(disposable, openWebviewCommand, todoHoverProvider);
