@@ -2,11 +2,13 @@
 
 ## Roadmap
 
-[] - inline anottation in editor for a todo
-[] - hover for a todo
-[] - React app for extension UI (webview)
-[] - Feed in data from external API to the webview
-[] - handle `git` within the extension context
+> These are just for POC
+
+[X] - inline anottation in editor for a todo
+[x] - hover for a todo
+[x] - React app for extension UI (webview)
+[x] - Feed in data from external API to the webview
+[x] - handle `git` within the extension context
 [] - handle persistable extension config
 
 ## Features
