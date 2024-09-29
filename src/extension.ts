@@ -16,6 +16,12 @@ const DEMO_TODO: Todo[] = [
 ];
 
 export function activate(context: vscode.ExtensionContext) {
+    const settings = vscode.workspace.getConfiguration('gitodo');
+    if (!settings.get('enable')) {
+        // TODO: i am not sure if this is the right way to handle if the extension is disabled
+        vscode.window.showInformationMessage('Gitodo is disabled');
+        return;
+    }
     // set up statusbar item
     const gitodoStatusbarItem = vscode.window.createStatusBarItem(
         vscode.StatusBarAlignment.Right,
