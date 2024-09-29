@@ -78,7 +78,22 @@
                 "key": "ctrl+shift+o",
                 "when": "editorTextFocus"
             }
-        ]
+        ],
+        "configuration": {
+            "title": "Gitodo",
+            "properties": {
+                "gitodo.enable": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable Gitodo Plugin"
+                },
+                "gitodo.appToken": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Gitodo App Token"
+                }
+            }
+        }
     },
     "eslintConfig": {
         "extends": "@yutengjing/eslint-config-typescript",
