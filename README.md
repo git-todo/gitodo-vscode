@@ -1,5 +1,14 @@
 # vscode extension boilerplate
 
+## Roadmap
+
+[] - inline anottation in editor for a todo
+[] - hover for a todo
+[] - React app for extension UI (webview)
+[] - Feed in data from external API to the webview
+[] - handle `git` within the extension context
+[] - handle persistable extension config
+
 ## Features
 
 - github actions support publish extension to both vs marketplace and open vsx
