@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 
+import { fetchApi } from './api';
 import { createNonce } from './createNonce';
 import type { GitExtensionAPI } from './types/git';
 import type { Todo } from './utils/markdown';
@@ -100,13 +101,26 @@ export function activate(context: vscode.ExtensionContext) {
             vscode.window.showInformationMessage('Starting Webview');
         }
 
+        fetchApi().then((data) => {
+            vscode.window.showInformationMessage('Data fetched');
+            panel.webview.postMessage({
+                type: 'apiData',
+                data,
+            });
+        });
+
         panel.webview.html = getWebviewContent({
             scriptJs: jsScriptPath,
             styleCss: cssStylePath,
         });
 
+        // this handles messages from the webview
         panel.webview.onDidReceiveMessage(async (msg: any) => {
-            console.log('message received', msg);
+            switch (msg.command) {
+                case 'startup':
+                    console.log('message received', msg);
+                    break;
+            }
         });
     });
 
