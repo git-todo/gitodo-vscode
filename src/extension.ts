@@ -61,7 +61,17 @@ export function activate(context: vscode.ExtensionContext) {
             }
 
             const repo = repositories[0];
+            console.log('repo', repo);
             vscode.window.showInformationMessage(`Git repository found: ${repo.state.HEAD?.name}`);
+
+            const remote =
+                repo.state.remotes.find((r) => r.name === 'origin') || repo.state.remotes[0];
+
+            if (remote) {
+                vscode.window.showInformationMessage(`Remote URL: ${remote.fetchUrl}`);
+            } else {
+                vscode.window.showInformationMessage('No remotes found in the repository.');
+            }
         });
     };
 

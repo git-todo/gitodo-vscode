@@ -7,6 +7,7 @@ interface Branch {
 
 interface RepositoryState {
     HEAD: Branch | undefined;
+    remotes: Array<{ name: string; fetchUrl: string }>;
 }
 
 interface Repository {
