@@ -3,6 +3,9 @@ import * as vscode from 'vscode';
 import { fetchApi } from './api';
 import { createNonce } from './createNonce';
 import type { GitExtensionAPI } from './types/git';
+import { createGithubRepoUrl } from './utils/createGithubRepoUrl';
+import { getGitBlameInfo } from './utils/gitBlameInfo';
+import { GitodoApi } from './utils/GitodoApi';
 import type { Todo } from './utils/markdown';
 import { createMarkDown } from './utils/markdown';
 
@@ -15,12 +18,20 @@ const DEMO_TODO: Todo[] = [
     },
 ];
 
+let githubRepoUrl: string | undefined;
+
 export function activate(context: vscode.ExtensionContext) {
     const settings = vscode.workspace.getConfiguration('gitodo');
     if (!settings.get('enable')) {
         // TODO: i am not sure if this is the right way to handle if the extension is disabled
         vscode.window.showInformationMessage('Gitodo is disabled');
         return;
+    }
+
+    const appToken = settings.get<string>('appToken');
+    let gitTodoApi: GitodoApi | undefined;
+    if (appToken) {
+        gitTodoApi = new GitodoApi(appToken);
     }
     // set up statusbar item
     const gitodoStatusbarItem = vscode.window.createStatusBarItem(
@@ -32,19 +43,16 @@ export function activate(context: vscode.ExtensionContext) {
 
     gitodoStatusbarItem.text = `$(zap) Gitodo Active`;
 
-    // gitodoStatusbarItem.show();
-
     const updateStatusBar = () => {
         if (!editor) {
             return;
         } else {
-            // const fileName = editor.document.fileName.split('/').pop();
             gitodoStatusbarItem.text = `$(checklist) Gitodo: ${DEMO_TODO.length} todos`;
         }
         gitodoStatusbarItem.show();
     };
 
-    const handleGitRepository = () => {
+    const handleGitRepository = async () => {
         const gitExtension: vscode.Extension<GitExtensionAPI> =
             vscode.extensions.getExtension('vscode.git')!;
         if (!gitExtension) {
@@ -52,7 +60,7 @@ export function activate(context: vscode.ExtensionContext) {
             return;
         }
 
-        gitExtension.activate().then(() => {
+        return gitExtension.activate().then(() => {
             const gitAPI = gitExtension.exports.getAPI(1);
             const repositories = gitAPI.repositories;
             if (repositories.length === 0) {
@@ -61,23 +69,39 @@ export function activate(context: vscode.ExtensionContext) {
             }
 
             const repo = repositories[0];
-            console.log('repo', repo);
             vscode.window.showInformationMessage(`Git repository found: ${repo.state.HEAD?.name}`);
 
             const remote =
                 repo.state.remotes.find((r) => r.name === 'origin') || repo.state.remotes[0];
 
-            if (remote) {
-                vscode.window.showInformationMessage(`Remote URL: ${remote.fetchUrl}`);
+            githubRepoUrl = createGithubRepoUrl(remote.fetchUrl);
+            if (githubRepoUrl) {
+                vscode.window.showInformationMessage(`GitHub URL: ${githubRepoUrl}`);
             } else {
-                vscode.window.showInformationMessage('No remotes found in the repository.');
+                vscode.window.showInformationMessage('No GitHub URL found.');
             }
         });
     };
 
     updateStatusBar();
-    setTimeout(() => {
-        handleGitRepository(); // need to wait a bit, otherwise it did not work
+
+    setTimeout(async () => {
+        await handleGitRepository(); // need to wait a bit, otherwise it did not work
+        const todos: any[] = [];
+        console.log('githubRepoUrl', githubRepoUrl);
+
+        if (gitTodoApi && githubRepoUrl) {
+            console.log('fetching todos');
+            gitTodoApi
+                .get(`/external/todos/${encodeURIComponent(githubRepoUrl)}`)
+                .then((response) => response.json())
+                .then((data: any[]) => {
+                    console.log('data', data);
+                    todos.push(data);
+                });
+        }
+
+        console.log('todos', todos);
     }, 1000);
 
     const disposable = vscode.commands.registerCommand('gitodo-test.helloWorld', () => {
@@ -196,16 +220,24 @@ export function activate(context: vscode.ExtensionContext) {
 
     // Register the hover provider
     const todoHoverProvider = vscode.languages.registerHoverProvider('*', {
-        provideHover(document, position) {
+        async provideHover(document, position) {
             const lineText = document.lineAt(position).text;
 
             if (lineText.includes('TODO') || lineText.includes('todo')) {
+                // get git blame info
+                const filePath = document.uri.fsPath;
+                const lineNumber = position.line;
+                const gitBlameInfo = await getGitBlameInfo(filePath, lineNumber);
+                // console.log('commitHash', commitHash);
+
                 // Return a hover message
-                const markDown = new vscode.MarkdownString(createMarkDown(DEMO_TODO[0]));
-                markDown.supportHtml = true;
-                markDown.isTrusted = true;
-                markDown.supportThemeIcons = true;
-                return new vscode.Hover(markDown);
+                if (gitBlameInfo) {
+                    const markDown = new vscode.MarkdownString(createMarkDown(DEMO_TODO[0]));
+                    markDown.supportHtml = true;
+                    markDown.isTrusted = true;
+                    markDown.supportThemeIcons = true;
+                    return new vscode.Hover(markDown);
+                }
             }
 
             return null;
@@ -216,7 +248,7 @@ export function activate(context: vscode.ExtensionContext) {
         todoCheck();
         showGitodoDecoration();
         updateStatusBar();
-        handleGitRepository();
+        // handleGitRepository();
     });
 
     context.subscriptions.push(disposable, openWebviewCommand, todoHoverProvider);

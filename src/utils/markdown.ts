@@ -7,6 +7,7 @@ export interface Todo {
     todo: string;
     commitHash: string;
     createdAt: Date;
+    commitMessage?: string;
 }
 
 // note: icons are from: https://microsoft.github.io/vscode-codicons/dist/codicon.html

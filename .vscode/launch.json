@@ -8,7 +8,7 @@
             "args": [
                 "--disable-extensions",
                 "--extensionDevelopmentPath=${workspaceFolder}",
-                "${workspaceFolder}/test-workspace"
+                "/Users/richardzilahi/zilahir/todo-demo"
             ],
             "outFiles": ["${workspaceFolder}/out/**/*.js"],
             "skipFiles": [
